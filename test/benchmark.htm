@@ -1,0 +1,33 @@
+<script src=benchmark.js></script>
+<script src=../src/browser-buffer.js></script>
+<script>
+var html = ""
+var suite = new Benchmark.Suite;
+
+function render(){
+    document.getElementById("list").innerHTML = html;
+}
+
+// add tests
+suite.add('new Buffer(size)', function() {
+  new Buffer(42);
+})
+.add('new Buffer(array)', function() {
+  new Buffer([1,2,3,4,5,6,7,8,9,10]);
+})
+.add('new Buffer(string, \'utf8\')', function() {
+  new Buffer('\u00bd + \u00bc = \u00be', 'utf8')
+})
+// add listeners
+.on('cycle', function(event, bench) {
+  html += "<li>" + String(bench);
+  render();
+})
+.on('complete', function(){
+    document.getElementById("loading").innerHTML = "";
+})
+// run async
+.run({ 'async': true });
+</script>
+<span id=loading>Running benchmarks...</span>
+<ul id=list></ul>

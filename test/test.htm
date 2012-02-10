@@ -1,0 +1,63 @@
+<script src=../src/browser-buffer.js></script>
+<ul id=test></ul>
+<script>
+
+    var html = "", buf, buf2, prefix = "";
+    function assert(message, pass){
+        html += "<li class=" + (pass ? "pass" : "fail") + ">" + prefix + "&mdash;" + message;
+    }
+    
+    
+    prefix = "new Buffer(size)";
+    buf = new Buffer(42);
+    assert(".length property", buf.length === 42);
+    assert("first and last values are 0", buf[0] === 0 && buf[41] === 0);
+    assert("values beyond length are undefined", buf[42] === undefined);
+    
+    
+    
+    prefix = "new Buffer(array)";
+    buf = new Buffer([1,2,3,4,5,6,7,8,9,10]);
+    
+    assert(".length property", buf.length === 10);
+    assert("first and last values are 1, 10", buf[0] === 1 && buf[9] === 10);
+    assert("values beyond length are undefined", buf[10] === undefined);
+    
+    
+    
+    prefix = "new Buffer(string, 'utf8')";
+    buf = new Buffer('\u00bd + \u00bc = \u00be', 'utf8');
+    
+    assert(".length property", buf.length === 12);
+    assert("first and last values are 194, 190", buf[0] === 194 && buf[11] === 190);
+    assert("values beyond length are undefined", buf[12] === undefined);
+    assert(".toString('utf8')", buf.toString('utf8') === '\u00bd + \u00bc = \u00be');
+    
+    
+    
+    prefix = ".write(string, 'encoding')";
+    buf = new Buffer(2 + 3);
+    
+    buf.write('\u00bd', 'utf8');
+    buf.write('abc', 2, 'ascii');
+    
+    assert('utf8', buf[0] === 194 && buf[1] === 189);
+    assert('ascii', buf[2] === 97 && buf[3] === 98 && buf[4] === 99);
+    
+    
+    prefix = 'misc'
+    var str = "node.js";
+    buf = new Buffer(str.length);
+    for (var i = 0; i < str.length ; i++) {
+      buf[i] = str.charCodeAt(i);
+    }
+    assert("Buffer[index]", buf.toString("ascii") === str)
+    
+    assert('Buffer.byteLength', Buffer.byteLength('\u00bd + \u00bc = \u00be', 'utf8') === 12)
+    
+    document.getElementById("test").innerHTML = html;
+</script>
+<style>
+    .pass{color:green}
+    .fail{color:red}
+</style>
