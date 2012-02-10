@@ -13,20 +13,27 @@
     
     var ArrayBuffer = window.ArrayBuffer || function(len){
         this.length = len;
-        while(l--) this[l] = 0;
+        while(len--) this[len] = 0;
+    },
+    Uint8Array = window.Uint8Array || function(parent, offset, length){
+        this.buffer = parent;
+        this.offset = offset;
+        this.length = length;
     }
     
-    //TODO: make it work without typed arrays
-    var makeBuffer = "__proto__" in window ? function(parent, offset, length){
+    window.Uint8Array || (Uint8Array.prototype = {
+        get: function(ind){
+            return this.buffer[ind + this.offset];
+        },
+        set: function(ind, value){
+            this.buffer[ind + this.offset] = value;
+        }
+    })
+    
+    var makeBuffer = function(parent, offset, length){
         var buf = new Uint8Array(parent, offset, length);
         buf.parent = parent;
-        buf.__proto__ = proto;
-        return buf;
-    }
-    :function(parent, offset, length){
-        var buf = new Uint8Array(parent, offset, length);
-        buf.parent = parent;
-        for(var x in proto) buf[x] = proto[x];
+        buf.offset = offset;
         return buf;
     },
     
@@ -67,7 +74,7 @@
               offset = 0;
             } else {
               // Small buffer.
-              if (!pool || pool.length - pool.used < this.length) allocPool();
+              if (!pool || pool.byteLength - pool.used < length) allocPool();
               parent = pool;
               offset = pool.used;
               pool.used += length;
@@ -77,7 +84,7 @@
             // Treat array-ish objects as a byte array.
             if (isArrayIsh(subject)) {
               for (var i = 0; i < length; i++) {
-                ret[i + offset] = subject[i];
+                ret[i] = subject[i];
               }
             } else if (type == 'string') {
               length = ret.write(subject, 0, encoding);
@@ -88,7 +95,7 @@
         return makeBuffer(parent, offset, length);
 },
     
-    proto = Buffer.prototype;
+    proto = Buffer.prototype = Uint8Array.prototype;
     
     
     proto.toString = function(encoding, start, end) {
@@ -205,8 +212,7 @@
     }
     
     proto.utf8Slice = function(start, end){
-        for(var string = "", c, i = start, p = 0, c2, c3; p < end; i++){
-            c = this[i];
+        for(var string = "", c, i = start, p = 0, c2, c3; p < end && (c = this[i]); i++){
             p++;
             if (c < 128) {
                 string += fCC(c);
@@ -248,8 +254,13 @@
     }
     
     proto.slice = function(from, to){
-        console.log(this.parent, from, to - from);
-        return makeBuffer(this.parent, from, to - from);
+        return makeBuffer(this.parent, from + this.offset, to - from);
+    }
+    
+    proto.toBlob = function(){
+        var b = new (window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder);
+        this.offset ? b.append(this.toString('utf8')) : b.append(this.parent);
+        return b.getBlob();
     }
     
     var pool;
