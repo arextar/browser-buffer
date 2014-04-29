@@ -89,7 +89,7 @@
                         throw new Error('First argument needs to be a number, ' + 'array or string.');
                 }
 
-                if (this.length > Buffer.poolSize) {
+                if (length > Buffer.poolSize) {
                     // Big buffer, just alloc one.
                     parent = new ArrayBuffer(length);
                     offset = 0;
