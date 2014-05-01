@@ -183,8 +183,8 @@
         encoding = String(encoding || 'utf8').toLowerCase();
 
         switch (encoding) {
-            /*case 'hex':
-             return this.hexWrite(string, offset, length);*/
+            case 'hex':
+             return this.hexWrite(string, offset, length);
 
             case 'utf8':
             case 'utf-8':
@@ -267,6 +267,24 @@
     function toHex(n) {
         if (n < 16) return '0' + n.toString(16);
         return n.toString(16);
+    }
+
+    proto.hexWrite = function(string, start, end) {
+        var charset = '0123456789abcdef';
+        string = string.toLowerCase();
+        for (var i = 0, le = string.length, byteCount = 0; i < end && i < le; i += 2, byteCount++){
+            var p1 = string[i];
+            var p2 = string[i+1];
+            var b = ((charVal(p1) << 4) | charVal(p2));
+            this[byteCount + start] = b;
+        }
+
+        function charVal(c){
+            for (var i = 0; i < charset.length; i++){
+                if (c == charset[i]) return i;
+            }
+            throw new Error('Invalid hex string');
+        }
     }
 
     proto.hexSlice = function (start, end) {
