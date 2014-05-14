@@ -971,6 +971,8 @@
         switch (encoding) {
             case "ascii":
                 return string.length;
+            case 'hex':
+                return string.length / 2;
         }
         for (var i = 0, l = 0, le = string.length, c; i < le; i++) {
             c = string.charCodeAt(i);
