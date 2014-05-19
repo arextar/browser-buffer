@@ -272,7 +272,7 @@
     proto.hexWrite = function(string, start, end) {
         var charset = '0123456789abcdef';
         string = string.toLowerCase();
-        for (var i = 0, le = string.length, byteCount = 0; i < end && i < le; i += 2, byteCount++){
+        for (var i = 0, le = string.length, byteCount = 0; (i / 2) < end && i < le; i += 2, byteCount++){
             var p1 = string[i];
             var p2 = string[i+1];
             var b = ((charVal(p1) << 4) | charVal(p2));
