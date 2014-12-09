@@ -313,16 +313,14 @@
         if (!start || start < 0) start = 0;
         if (!end || end < 0 || end > len) end = len;
 
-        var out = '';
-        for (var i = start; i < end; i++) {
-            out += window.btoa(this[i]);
-        }
-        return out;
+        var data = this.utf8Slice(start, end);
+        return window.btoa(data);
     };
 
     proto.base64Write = function (string, start, end) {
-        for (var i = 0, le = string.length; i < end && i < le; i++) {
-            this[i + start] = window.atob( string.charCodeAt(i) );
+        var data = window.atob(string);
+        for (var i = 0, le = data.length; i < end && i < le; i++) {
+            this[i + start] = window.atob( data.charCodeAt(i) );
         }
         this._charsWritten = i;
         return le;
