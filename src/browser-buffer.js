@@ -89,7 +89,7 @@
                         throw new Error('First argument needs to be a number, ' + 'array or string.');
                 }
 
-                if (this.length > Buffer.poolSize) {
+                if (length > Buffer.poolSize) {
                     // Big buffer, just alloc one.
                     parent = new ArrayBuffer(length);
                     offset = 0;
@@ -183,8 +183,8 @@
         encoding = String(encoding || 'utf8').toLowerCase();
 
         switch (encoding) {
-            /*case 'hex':
-             return this.hexWrite(string, offset, length);*/
+            case 'hex':
+             return this.hexWrite(string, offset, length);
 
             case 'utf8':
             case 'utf-8':
@@ -269,6 +269,24 @@
         return n.toString(16);
     }
 
+    proto.hexWrite = function(string, start, end) {
+        var charset = '0123456789abcdef';
+        string = string.toLowerCase();
+        for (var i = 0, le = string.length, byteCount = 0; (i / 2) < end && i < le; i += 2, byteCount++){
+            var p1 = string[i];
+            var p2 = string[i+1];
+            var b = ((charVal(p1) << 4) | charVal(p2));
+            this[byteCount + start] = b;
+        }
+
+        function charVal(c){
+            for (var i = 0; i < charset.length; i++){
+                if (c == charset[i]) return i;
+            }
+            throw new Error('Invalid hex string');
+        }
+    }
+
     proto.hexSlice = function (start, end) {
         var len = this.length;
 
@@ -295,16 +313,14 @@
         if (!start || start < 0) start = 0;
         if (!end || end < 0 || end > len) end = len;
 
-        var out = '';
-        for (var i = start; i < end; i++) {
-            out += window.btoa(this[i]);
-        }
-        return out;
+        var data = this.utf8Slice(start, end);
+        return btoa(data);
     };
 
     proto.base64Write = function (string, start, end) {
-        for (var i = 0, le = string.length; i < end && i < le; i++) {
-            this[i + start] = window.atob( string.charCodeAt(i) );
+        var data = window.atob(string);
+        for (var i = 0, le = data.length; i < end && i < le; i++) {
+            this[i + start] = atob( data.charCodeAt(i) );
         }
         this._charsWritten = i;
         return le;
@@ -953,6 +969,8 @@
         switch (encoding) {
             case "ascii":
                 return string.length;
+            case 'hex':
+                return string.length / 2;
         }
         for (var i = 0, l = 0, le = string.length, c; i < le; i++) {
             c = string.charCodeAt(i);
