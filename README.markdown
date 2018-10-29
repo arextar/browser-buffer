@@ -27,5 +27,5 @@ An attempt at mimicing node.js's Buffer API in the browser using typed arrays. T
 
 ## Online Tests from /test/ folder
 * [test](https://username1565.github.io/browser-buffer/test/test.htm)
-* [benchmark](https://username1565.github.io/browser-buffer/test/benchmark.htm)
+* [benchmark (wait some time)](https://username1565.github.io/browser-buffer/test/benchmark.htm)
 * [debug (no display anything)](https://username1565.github.io/browser-buffer/test/debug.htm)
