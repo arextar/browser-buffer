@@ -26,6 +26,6 @@ An attempt at mimicing node.js's Buffer API in the browser using typed arrays. T
     4. ucs-2
 
 ## Online Tests from /test/ folder
-test: https://username1565.github.io/browser-buffer/test/test.htm
-benchmark: https://username1565.github.io/browser-buffer/test/benchmark.htm
-debug (no display something): https://username1565.github.io/browser-buffer/test/debug.htm
+* test: https://username1565.github.io/browser-buffer/test/test.htm
+* benchmark: https://username1565.github.io/browser-buffer/test/benchmark.htm
+* debug (no display something): https://username1565.github.io/browser-buffer/test/debug.htm
